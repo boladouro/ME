@@ -5,16 +5,21 @@ library(conflicted)
 library(tictoc)     # timing
 ```
 
-$${\displaystyle f(x|\text{min},\text{max},\text{mean})={\begin{cases}
-    {\frac {2(x-\text{min})}{(\text{max}-\text{min})(\text{mean}-\text{min})}}&,\;\text{min}\leq x=\text{mean}\\
-    &\\{\frac {2}{\text{max}-\text{min}}}&,\;x=\text{mean}\\
-    &\\{\frac {2(\text{max}-x)}{(\text{max}-\text{min})(\text{max}-\text{mean})}}&,\;\text{mean}<x\leq \text{max}
-\end{cases}}}$$
+$$
+f(x | a, b, c) = 
+\begin{cases}
+  0                         & \text{se} \; x < a \\
+  \frac{2(x-a)}{(b-a)(c-a)} & \text{se} \; a \leq x < c \\
+  \frac{2}{b-a}             & \text{se} \; x = c \\
+  \frac{2(b-x)}{(b-a)(b-c)} & \text{se} \; c < x \leq b \\
+  0                         & \text{se} \; x > b
+\end{cases}
+$$
 
 ```{r distribuição-triangular}
 pdf_triang_abc <- function(x, a, b, c) {
   case_when(
-    x < a || x > b   ~ 0,
+    x < a | x > b   ~ 0,
     x < c            ~ 2 * (x - a) / ((b - a) * (c - a)),
     x == c           ~ 2 / (b - a),
     c < x            ~ 2 * (b - x) / ((b - a) * (b - c)),
