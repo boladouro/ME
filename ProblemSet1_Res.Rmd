@@ -1,0 +1,77 @@
+```{r packages}
+# rm(list = ls())
+library(ggplot2)
+library(tidyverse)
+```
+
+$${\displaystyle f(x|\text{min},\text{max},\text{mean})={\begin{cases}
+    {\frac {2(x-\text{min})}{(\text{max}-\text{min})(\text{mean}-\text{min})}}&,\;\text{min}\leq x=\text{mean}\\
+    &\\{\frac {2}{\text{max}-\text{min}}}&,\;x=\text{mean}\\
+    &\\{\frac {2(\text{max}-x)}{(\text{max}-\text{min})(\text{max}-\text{mean})}}&,\;\text{mean}<x\leq \text{max}
+\end{cases}}}$$
+
+
+```{r distribuição triangular}
+set.seed(2023)
+
+dist_triangular <- function(x, min_value, max_value, mode_value) {
+  if (x <= mode_value) {
+    return(2 * (x - min_value) / ((max_value - min_value) * (mode_value - min_value)))
+  } else {
+    return(2 * (max_value - x) / ((max_value - min_value) * (max_value - mode_value)))
+  }
+}
+```
+
+
+```{r}
+generate_triangular_random <- function(n, min_value, max_value, mode_value) {
+  k <- 0
+  j <- 0
+  y <- numeric(n)
+
+  while (k < n) {
+    u <- runif(1)
+    j <- j + 1
+    x <- runif(1, min_value, max_value)
+    dist_trg <- dist_triangular(x, min_value, max_value, mode_value)
+
+    if (u <= dist_trg) {
+      k <- k + 1
+      y[k] <- x
+    }
+  }
+  return(y)
+}
+```
+
+```{r plots}
+NPA <- generate_triangular_random(10000, 0, 10, 5) %>%
+  data.frame(NPA = .)
+
+# Densidade dos NPA gerados
+density_plot <- ggplot(NPA, aes(x = NPA)) +
+  geom_density(fill = "blue", alpha = 0.5) +
+  labs(x = "NPA", y = "Densidade") +
+  ggtitle("Densidade dos NPA Gerados")
+
+print(density_plot)
+
+# TODO gráfico (fiz um simples, mas seria interessante fazer o triângulo da distrib.)
+```
+
+
+## Exercício 2
+
+$s_1=\displaystyle\frac{Q_3-Q_1-2Q_2}{Q_3-Q_1}$
+
+$s_2=\displaystyle\frac{(\mu-\upsilon)}{E(|X-\upsilon|)}$
+
+
+```{r}
+# TODO
+```
+
+
+
+
