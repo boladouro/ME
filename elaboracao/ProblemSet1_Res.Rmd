@@ -35,10 +35,21 @@ pdf(2,1,3,2.5)
 
 
 ```{r}
-aceitacao_rejeicao_triang <- function(n, minT=0, maxT=1, modeT=0.5) {
-  f <- \(x) pdf_triang(x, minT, maxT,modeT)
-  # vamos usar uma normal
-  g <- \(x) dnorm(x, mean = modeT, )
+generate_triangular_random <- function(n, min_value, max_value, mode_value) {
+  k <- 0
+  j <- 0
+  y <- numeric(n)
+  while (k < n) {
+    u <- runif(1)
+    j <- j + 1
+    x <- runif(1, min_value, max_value)
+    dist_trg <- dist_triangular(x, min_value, max_value, mode_value)
+    if (u <= dist_trg) {
+      k <- k + 1
+      y[k] <- x
+    }
+  }
+  return(y)
 }
 ```
 
