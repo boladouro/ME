@@ -1,6 +1,3 @@
-
-
-
 # compila o rnw
 build:
   R -e "if (!require('knitr')) install.packages('knitr')"

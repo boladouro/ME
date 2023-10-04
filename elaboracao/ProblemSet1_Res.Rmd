@@ -1,7 +1,8 @@
 ```{r packages}
 # rm(list = ls())
-library(ggplot2)
 library(tidyverse)
+library(conflicted)
+library(tictoc)     # timing
 ```
 
 $${\displaystyle f(x|\text{min},\text{max},\text{mean})={\begin{cases}
@@ -10,22 +11,26 @@ $${\displaystyle f(x|\text{min},\text{max},\text{mean})={\begin{cases}
     &\\{\frac {2(\text{max}-x)}{(\text{max}-\text{min})(\text{max}-\text{mean})}}&,\;\text{mean}<x\leq \text{max}
 \end{cases}}}$$
 
-
-```{r distribuição triangular}
-set.seed(2023)
-
-dist_triangular <- function(x, min_value, max_value, mode_value) {
-  if (x <= mode_value) {
-    return(2 * (x - min_value) / ((max_value - min_value) * (mode_value - min_value)))
-  } else {
-    return(2 * (max_value - x) / ((max_value - min_value) * (max_value - mode_value)))
-  }
+```{r distribuição-triangular}
+pdf_triang_abc <- function(x, a, b, c) {
+  case_when(
+    x < a || x > b   ~ 0,
+    x < c            ~ 2 * (x - a) / ((b - a) * (c - a)),
+    x == c           ~ 2 / (b - a),
+    c < x            ~ 2 * (b - x) / ((b - a) * (b - c)),
+    TRUE             ~ NA_real_
+  )
 }
+pdf_triang <- \(x, min, max, mode) pdf_triang_abc(x, min, max, mode)
+pdf <- pdf_triang_abc
+
+extraDistr::dtriang(20000,10000,30000,25000)
+pdf(20000,10000,30000,25000)
 ```
 
 
 ```{r}
-generate_triangular_random <- function(n, min_value, max_value, mode_value) {
+aceitacao_rejeicao <- function(n, min_value, max_value, mode_value) {
   k <- 0
   j <- 0
   y <- numeric(n)
@@ -34,7 +39,7 @@ generate_triangular_random <- function(n, min_value, max_value, mode_value) {
     u <- runif(1)
     j <- j + 1
     x <- runif(1, min_value, max_value)
-    dist_trg <- dist_triangular(x, min_value, max_value, mode_value)
+    dist_trg <- pdf(x, min_value, max_value, mode_value)
 
     if (u <= dist_trg) {
       k <- k + 1
@@ -43,18 +48,22 @@ generate_triangular_random <- function(n, min_value, max_value, mode_value) {
   }
   return(y)
 }
+generate_triangular_random(10, 0, 10, 5)
 ```
 
 ```{r plots}
+set.seed(2023)
+tic()
 NPA <- generate_triangular_random(10000, 0, 10, 5) %>%
   data.frame(NPA = .)
-
+toc()
 # Densidade dos NPA gerados
 density_plot <- ggplot(NPA, aes(x = NPA)) +
   geom_density(fill = "blue", alpha = 0.5) +
   labs(x = "NPA", y = "Densidade") +
   ggtitle("Densidade dos NPA Gerados")
 
+toc(log = TRUE)
 print(density_plot)
 
 # TODO gráfico (fiz um simples, mas seria interessante fazer o triângulo da distrib.)
