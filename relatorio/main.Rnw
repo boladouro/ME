@@ -1,0 +1,10 @@
+\documentclass[justified, 11pt]{scrartcl}
+
+\begin{document}
+  Hello from \LaTeX!
+  
+  <<echo=FALSE>>=
+    x <- 1:10
+    x
+  @
+\end{document}
