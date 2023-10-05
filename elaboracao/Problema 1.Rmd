@@ -207,10 +207,10 @@ hist(aceitacao_rejeicao_triang(10000, 1, 100, 75), breaks=20, main="triang", xla
 # Agora bonito
 ggplot(tibble(x = generated), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
-  geom_density(aes(color = "observado"), kernel = "gaussian", linewidth = 1, fill = "red", alpha = 0.2) + 
+  geom_density(aes(color = "observado"), kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.4) + 
   stat_function(aes(color = "teorico"), fun = dtriang, args = list(a = 1, b = 100, c = 50), linewidth = 1) +
-  labs(title = "Distribuição triangular gerada (a = 1, b = 100, c = 50)", x = "x", y = "Densidade") + 
-  scale_colour_manual("", values = c("observado" = "red", "teorico" = "blue"), guide = guide_legend())
+  labs(title = "Distribuição triangular gerada (a = 1, b = 100, c = 50)", x = "x", y = "Densidade") +
+  scale_colour_manual("", values = c("observado" = "#F73859", "teorico" = "#404B69"), guide = guide_legend())
 ```
 
 

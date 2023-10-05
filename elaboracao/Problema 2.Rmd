@@ -1,4 +1,8 @@
-https://en.wikipedia.org/wiki/Skewness
+
+```{r}
+library(tidyverse)
+```
+
 
 #### Quantile-based measures
 $$
@@ -47,6 +51,44 @@ amostras_ii.s1  <- apply(amostras_ii,  2, estim.s1)
 amostras_ii.s2  <- apply(amostras_ii,  2, estim.s2)
 amostras_iii.s1 <- apply(amostras_iii, 2, estim.s1)
 amostras_iii.s2 <- apply(amostras_iii, 2, estim.s2)
+
+# boxplot with all of these
+boxplot(
+  amostras_i.s1, amostras_i.s2,
+  amostras_ii.s1, amostras_ii.s2,
+  amostras_iii.s1, amostras_iii.s2,
+  names = c("100x20 s1", "100x20 s2", "100x100 s1", "100x100 s2", "100x1000 s1", "100x1000 s2")
+)
+
+```
+
+
+```{r}
+# ggplot boxplot with facet_wrap
+set.seed(2023)
+df <- tibble(
+  estimado = c(amostras_i.s1, amostras_i.s2, amostras_ii.s1, amostras_ii.s2, amostras_iii.s1, amostras_iii.s2),
+  estimador = c(rep("s1", length( amostras_i.s1)),
+                rep("s2", length( amostras_i.s2)),
+                rep("s1", length(amostras_ii.s1)),
+                rep("s2", length(amostras_ii.s2)),
+                rep("s1", length(amostras_iii.s1)),
+                rep("s2", length(amostras_iii.s2))),
+  n_amostras_x_dimensao = c(rep("100x20", length(amostras_i.s1)),
+                            rep("100x20", length(amostras_i.s2)),
+                            rep("100x100", length(amostras_ii.s1)),
+                            rep("100x100", length(amostras_ii.s2)),
+                            rep("100x1000", length(amostras_iii.s1)),
+                            rep("100x1000", length(amostras_iii.s2)))
+)
+ggplot(df, aes(x = estimador, y = estimado)) +
+  geom_boxplot(aes(fill = estimador), alpha=0.6) + 
+  geom_jitter(color="black", size=0.7, alpha=0.9) +
+  scale_fill_manual(values=c("#F73859", "#404B69")) +
+  facet_wrap(~ n_amostras_x_dimensao) + 
+  labs(
+    title = "Boxplot dos estimadores s1 e s2",
+  )
 ```
 
 
