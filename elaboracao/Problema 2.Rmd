@@ -1,64 +1,73 @@
 https://en.wikipedia.org/wiki/Skewness
 
 #### Quantile-based measures
-$s_1=\displaystyle\frac{Q_3+Q_1-2Q_2}{Q_3-Q_1}$
+$$
+s_1=\displaystyle\frac{Q_3+Q_1-2Q_2}{Q_3-Q_1}
+$$
 
 
 #### Groeneveld and Meeden's coefficient
-$s_2=\displaystyle\frac{(\mu-\nu)}{E(|X-\nu|)}$
-
+$$
+s_2=\displaystyle\frac{(\mu-\nu)}{E(|X-\nu|)}
+$$
 
 ### alínea a)
 
 ```{r}
-set.seed(2023)
+gerar_amostras <- function(n_amostras, dimensao_de_cada_amostra, seed = 2023) {
+  set.seed(seed)
+  df <- dimensao_de_cada_amostra
+  matrix(rt(n = n_amostras * dimensao_de_cada_amostra, df = df), nrow = dimensao_de_cada_amostra)
+}
 
-n_i <- 20
-n_ii <- 100
-n_iii <- 1000
-
-# numero de amostras
-n_amostras <- 100
-
-# ?rt
-# Student-t
-amostras_i <- matrix(rt(n = n_i * n_amostras, df = n_i), nrow = n_i)
-amostras_ii <- matrix(rt(n = n_ii * n_amostras, df = n_ii), nrow = n_ii)
-amostras_iii <- matrix(rt(n = n_iii * n_amostras, df = n_iii), nrow = n_iii)
+amostras_i   <- gerar_amostras(100, 20)
+amostras_ii  <- gerar_amostras(100, 100)
+amostras_iii <- gerar_amostras(100, 1000)
 ```
 
 ### alínea b)
 
 ```{r}
-estim_s1 <- function(x){
+estim.s1 <- function(x){
   Q1 <- quantile(x, 0.25)
   Q2 <- quantile(x, 0.5)
   Q3 <- quantile(x, 0.75)
-  return ((Q3+Q1-2*Q2)/(Q3-Q1))
+  (Q3+Q1-2*Q2)/(Q3-Q1)
 }
 
-estim_s2 <- function(x){
+estim.s2 <- function(x){
   miu <- mean(x)
   nu <- median(x)
-  return ((miu - nu)/mean(abs(x - nu)))
+  (miu - nu)/mean(abs(x - nu))
 }
 
-# ?apply
-
-(skewA_ai1 <- mean(apply(amostras_i, MARGIN = 2, FUN = estim_s1)))
-(skewA_ai2 <- mean(apply(amostras_i, MARGIN = 2, FUN = estim_s2)))
-
-(skewA_aii1 <- mean(apply(amostras_ii, MARGIN = 2, FUN = estim_s1)))
-(skewA_aii2 <- mean(apply(amostras_ii, MARGIN = 2, FUN = estim_s2)))
-
-(skewA_aiii1 <- mean(apply(amostras_iii, MARGIN = 2, FUN = estim_s1)))
-(skewA_aiii2 <- mean(apply(amostras_iii, MARGIN = 2, FUN = estim_s2)))
+amostras_i.s1   <- apply(amostras_i,   2, estim.s1)
+amostras_i.s2   <- apply(amostras_i,   2, estim.s2)
+amostras_ii.s1  <- apply(amostras_ii,  2, estim.s1)
+amostras_ii.s2  <- apply(amostras_ii,  2, estim.s2)
+amostras_iii.s1 <- apply(amostras_iii, 2, estim.s1)
+amostras_iii.s2 <- apply(amostras_iii, 2, estim.s2)
 ```
+
 
 ### alínea c)
 
 ```{r}
-# TODO, n me apeteceu
+mse <- function(predicted, actual) {
+  # actual aqui e so um valor
+  sum((predicted - actual)^2) / length(predicted)
+}
+
+# skewness of t student is 0 for df > 3
+
+df <- data.frame(
+  `n_amostras x dimensao` = c("100x20", "100x100", "100x1000"),
+  `Erro padrão de s_1` = c(sd(amostras_i.s1) %>% round(3), sd(amostras_ii.s1) %>% round(3), sd(amostras_iii.s1) %>% round(3)),
+  `Erro padrão de s_2` = c(sd(amostras_i.s2) %>% round(3), sd(amostras_ii.s2) %>% round(3), sd(amostras_iii.s2) %>% round(3)),
+  `Erro quadrático médio de s_1` = c(mse(amostras_i.s1, 0) %>% round(3), mse(amostras_ii.s1, 0) %>% round(3), mse(amostras_iii.s1, 0) %>% round(3)),
+  `Erro quadrático médio de s_2` = c(mse(amostras_i.s2, 0) %>% round(3), mse(amostras_ii.s2, 0) %>% round(3), mse(amostras_iii.s2, 0) %>% round(3))
+)
+df
 ```
 
-
+Em todas as situações, o estimador $s_2$ apresenta um erro menor que o estimador $s_1$. Isso significa que o estimador $s_2$ é melhor a estimar a assimetria da distribuição t de Student quando esta apresenta $\nu = n$
