@@ -1,0 +1,64 @@
+https://en.wikipedia.org/wiki/Skewness
+
+#### Quantile-based measures
+$s_1=\displaystyle\frac{Q_3+Q_1-2Q_2}{Q_3-Q_1}$
+
+
+#### Groeneveld and Meeden's coefficient
+$s_2=\displaystyle\frac{(\mu-\nu)}{E(|X-\nu|)}$
+
+
+### alínea a)
+
+```{r}
+set.seed(2023)
+
+n_i <- 20
+n_ii <- 100
+n_iii <- 1000
+
+# numero de amostras
+n_amostras <- 100
+
+# ?rt
+# Student-t
+amostras_i <- matrix(rt(n = n_i * n_amostras, df = n_i), nrow = n_i)
+amostras_ii <- matrix(rt(n = n_ii * n_amostras, df = n_ii), nrow = n_ii)
+amostras_iii <- matrix(rt(n = n_iii * n_amostras, df = n_iii), nrow = n_iii)
+```
+
+### alínea b)
+
+```{r}
+estim_s1 <- function(x){
+  Q1 <- quantile(x, 0.25)
+  Q2 <- quantile(x, 0.5)
+  Q3 <- quantile(x, 0.75)
+  return ((Q3+Q1-2*Q2)/(Q3-Q1))
+}
+
+estim_s2 <- function(x){
+  miu <- mean(x)
+  nu <- median(x)
+  return ((miu - nu)/mean(abs(x - nu)))
+}
+
+# ?apply
+
+(skewA_ai1 <- mean(apply(amostras_i, MARGIN = 2, FUN = estim_s1)))
+(skewA_ai2 <- mean(apply(amostras_i, MARGIN = 2, FUN = estim_s2)))
+
+(skewA_aii1 <- mean(apply(amostras_ii, MARGIN = 2, FUN = estim_s1)))
+(skewA_aii2 <- mean(apply(amostras_ii, MARGIN = 2, FUN = estim_s2)))
+
+(skewA_aiii1 <- mean(apply(amostras_iii, MARGIN = 2, FUN = estim_s1)))
+(skewA_aiii2 <- mean(apply(amostras_iii, MARGIN = 2, FUN = estim_s2)))
+```
+
+### alínea c)
+
+```{r}
+# TODO, n me apeteceu
+```
+
+
