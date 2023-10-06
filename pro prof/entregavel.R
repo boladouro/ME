@@ -31,7 +31,7 @@ rtriang <- function(n, a = 0, b = 1, c = 0.5) {
   # x (random variable) generator 
   X <- \() runif(1, a, b)
   # c: max of f, so that c >= f(x) / g(x) for all x
-  C <- 100 ## o maximo da funcao triangular e no dtriang(c)
+  C <- f(c)/g(c) ## o maximo da funcao triangular e no dtriang(c)
   # monte carlo (u(0, 1) <= f(x) / (c*g(x)) <=> u(0, c*g(x)) <= f(x))
   u <- \(x) runif(n=1, min=0, max=1)
   
@@ -73,8 +73,8 @@ gg4 <- ggplot(tibble(x = rtriang(10000, 1, 100, 70)), aes(x)) +
   stat_function(fun = dtriang, args = list(a = 1, b = 100, c = 70), color = "#404B69", linewidth = 1) +
   labs(title = "a = 1, b = 100, c = 70", x = "x", y = "Densidade")
 
-mygrid <- grid.arrange(gg1, gg2, gg3 , gg4, nrow=2, ncol=2,top="Distribuição triangular gerada")
-ggsave(filename = "mygrid_plot.svg",plot = mygrid, device = "svg", width = 21, units = "cm")
+grid.arrange(gg1, gg2, gg3 , gg4, nrow=2, ncol=2,top="Distribuição triangular gerada") %>% 
+  ggsave(filename = "mygrid_plot.svg", device = "svg", width = 2400, height= 1800, units = "px")
 
 ######################## Exercício 2 #######################################
 
@@ -133,14 +133,14 @@ df$n_amostras_x_dimensao <- factor(df$n_amostras_x_dimensao, levels = c("100x20"
 
 box_jitter_ex2 <- ggplot(df, aes(x = estimador, y = estimado)) +
   geom_boxplot(aes(fill = estimador), alpha=0.6) + 
-  geom_jitter(color="black", size=0.7, alpha=0.9) +
+  geom_jitter(color="black", size=0.5, alpha=0.9) +
   scale_fill_manual(values=c("#F73859", "#404B69")) +
   facet_wrap(~ n_amostras_x_dimensao) + 
   labs(
     title = "Boxplot dos estimadores s1 e s2",
   )
 
-ggsave(filename = "box_jitter_ex2.svg",plot = box_jitter_ex2, device = "svg", width = 21, units = "cm")
+ggsave(filename = "box_jitter_ex2.svg",plot = box_jitter_ex2, device = "svg", width = 2400, height= 1800, units = "px")
 
 # c)
 
