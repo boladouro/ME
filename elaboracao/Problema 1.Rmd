@@ -76,7 +76,7 @@ aceitacao_rejeicao_triang <- function(n, a = 0, b = 1, c = 0.5) {
   # x (random variable) generator 
   X <- \() runif(1, a, b)
   # c: max of f, so that c >= f(x) / g(x) for all x
-  C <- 100 ## o maximo da funcao triangular e no dtriang(c) TODO isto ta mal fsr pq se pusermos mais alto fica bem
+  C <- 100 ## o maximo da funcao triangular e no dtriang(c)
   # monte carlo (u(0, 1) <= f(x) / (c*g(x)) <=> u(0, c*g(x)) <= f(x))
   u <- \(x) runif(n=1, min=0, max=1)
   
@@ -97,7 +97,7 @@ aceitacao_rejeicao_special <- function(n) {
   # x (random variable) generator 
   X <- \() runif(1)
   # c: max of f, so that c >= f(x) / g(x) for all x
-  C <- f(1) ## o maximo da funcao triangular e no dtriang(c) TODO isto ta mal fsr pq se pusermos mais alto fica bem
+  C <- f(1) ## o maximo da funcao triangular e no dtriang(c)
   # monte carlo (u(0, 1) <= f(x) / (c*g(x)) <=> u(0, c*g(x)) <= f(x))
   u <- \(x) runif(n=1, min=0, max=1)
   
@@ -216,26 +216,34 @@ ggplot(tibble(x = generated), aes(x)) +
 
 ```{r}
 ?rnorm
+# a = 0, b = 100 e c = 50
+set.seed(2023)
+ggplot(tibble(x = rtriang(10000, 0, 100, 50)), aes(x)) + 
+  geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
+  geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
+  stat_function(fun = dtriang, args = list(a = 0, b = 100, c = 50), color = "#404B69", linewidth = 1) +
+  labs(title = "Distribuição triangular gerada (a = 0, b = 100, c = 50)", x = "x", y = "Densidade")
 # a = 0, b = 10 e c = 5
 set.seed(2023)
 ggplot(tibble(x = rtriang(10000, 0, 10, 5)), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
-  geom_density(color = "red", kernel = "gaussian", linewidth = 1, fill = "red", alpha = 0.25) + 
-  stat_function(fun = dtriang, args = list(a = 0, b = 10, c = 5), color = "blue", linewidth = 1) +
+  geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
+  stat_function(fun = dtriang, args = list(a = 0, b = 10, c = 5), color = "#404B69", linewidth = 1) +
   labs(title = "Distribuição triangular gerada (a = 0, b = 10, c = 5)", x = "x", y = "Densidade")
 # a = 1, b = 2, c = 1.2
 set.seed(2023)
 ggplot(tibble(x = rtriang(10000, 1, 2, 1.2)), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
-  geom_density(color = "red", kernel = "gaussian", linewidth = 1, fill = "red", alpha = 0.25) + 
-  stat_function(fun = dtriang, args = list(a = 1, b = 2, c = 1.2), color = "blue", linewidth = 1) +
+  geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
+  stat_function(fun = dtriang, args = list(a = 1, b = 2, c = 1.2), color = "#404B69", linewidth = 1) +
   labs(title = "Distribuição triangular gerada (a = 1, b = 2, c = 1.2)", x = "x", y = "Densidade")
 # a = 1, b = 100, c = 70
 set.seed(2023)
 ggplot(tibble(x = rtriang(10000, 1, 100, 70)), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
-  geom_density(color = "red", kernel = "gaussian", linewidth = 1, fill = "red", alpha = 0.25) + 
-  stat_function(fun = dtriang, args = list(a = 1, b = 100, c = 70), color = "blue", linewidth = 1) +
+  geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
+  stat_function(fun = dtriang, args = list(a = 1, b = 100, c = 70), color = "#404B69", linewidth = 1) +
   labs(title = "Distribuição triangular gerada (a = 1, b = 100, c = 70)", x = "x", y = "Densidade")
 
 ```
+

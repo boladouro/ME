@@ -53,12 +53,12 @@ amostras_iii.s1 <- apply(amostras_iii, 2, estim.s1)
 amostras_iii.s2 <- apply(amostras_iii, 2, estim.s2)
 
 # boxplot with all of these
-boxplot(
-  amostras_i.s1, amostras_i.s2,
-  amostras_ii.s1, amostras_ii.s2,
-  amostras_iii.s1, amostras_iii.s2,
-  names = c("100x20 s1", "100x20 s2", "100x100 s1", "100x100 s2", "100x1000 s1", "100x1000 s2")
-)
+#boxplot(
+#  amostras_i.s1, amostras_i.s2,
+#  amostras_ii.s1, amostras_ii.s2,
+#  amostras_iii.s1, amostras_iii.s2,
+#  names = c("100x20 s1", "100x20 s2", "100x100 s1", "100x100 s2", "100x1000 s1", "100x1000 s2")
+#)
 
 ```
 
