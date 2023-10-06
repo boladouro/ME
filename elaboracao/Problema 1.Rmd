@@ -76,14 +76,14 @@ aceitacao_rejeicao_triang <- function(n, a = 0, b = 1, c = 0.5) {
   # x (random variable) generator 
   X <- \() runif(1, a, b)
   # c: max of f, so that c >= f(x) / g(x) for all x
-  C <- 100 ## o maximo da funcao triangular e no dtriang(c)
+  C <- (f(c)/g(c)) ## o maximo da funcao triangular e no dtriang(c)
   # monte carlo (u(0, 1) <= f(x) / (c*g(x)) <=> u(0, c*g(x)) <= f(x))
-  u <- \(x) runif(n=1, min=0, max=1)
+  u <- \() runif(n=1, min=0, max=1)
   
   ret <- c()
   while(length(ret) < n) {
     x <- X()
-    if (u(x) <= f(x) / (C*g(x)))
+    if (u() <= f(x) / (C*g(x)))
       ret <- c(ret, x)
   }
   ret
@@ -133,11 +133,7 @@ aceitacao_rejeicao_como_prof_fez(5, 0, 10, 5)
 ```
 
 
-```{r temp}
-# Define the parameters of the triangular distribution
-a <- 1  # Lower bound
-b <- 5  # Upper bound
-c <- 3  # Mode (peak)
+```{r temp-chatgpt}
 
 # Define the function for the triangular distribution
 triangular_pdf <- function(x, a, b, c) {
@@ -179,7 +175,13 @@ generate_triangular <- function(n, a, b, c) {
 # Generate 1000 random numbers from the triangular distribution
 n <- 1000
 # Plot a histogram to visualize the generated samples
-hist(generate_triangular(10000, 1, 100, 50), breaks=1000, main="chatgpt", xlab="x")
+ggplot(tibble(x = generated), aes(x)) + 
+  geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
+  geom_density(aes(color = "observado"), kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.4) + 
+  stat_function(aes(color = "teorico"), fun = dtriang, args = list(a = 1, b = 100, c = 50), linewidth = 1) +
+  labs(title = "Distribuição triangular gerada (a = 1, b = 100, c = 50)", x = "x", y = "Densidade") +
+  scale_colour_manual("", values = c("observado" = "#F73859", "teorico" = "#404B69"), guide = guide_legend())
+
 ```
 
 
@@ -192,14 +194,14 @@ generated %>% head()
 ```
 
 ```{r}
-set.seed(2023)
-hist(generated, breaks=20, main="main", xlab="x")
-# hist(extraDistr::rtriang(10000, 1, 2, 0.5), breaks=1000, main="teorico", xlab="x")
-hist(aceitacao_rejeicao_como_prof_fez(10000, 1, 100, 50), breaks=20, main="prof", xlab="x")
-hist(aceitacao_rejeicao_triang_old(10000, 1, 100, 50), breaks=20, main="triang_old", xlab="x")
-hist(aceitacao_rejeicao_special_old(10000), breaks=20, main="special_old", xlab="x")
-hist(aceitacao_rejeicao_special(10000), breaks=20, main="special", xlab="x")
-hist(aceitacao_rejeicao_triang(10000, 1, 100, 75), breaks=20, main="triang", xlab="x")
+## set.seed(2023)
+## hist(generated, breaks=20, main="main", xlab="x")
+## # hist(extraDistr::rtriang(10000, 1, 2, 0.5), breaks=1000, main="teorico", xlab="x")
+## hist(aceitacao_rejeicao_como_prof_fez(10000, 1, 100, 50), breaks=20, main="prof", xlab="x")
+## hist(aceitacao_rejeicao_triang_old(10000, 1, 100, 50), breaks=20, main="triang_old", xlab="x")
+## hist(aceitacao_rejeicao_special_old(10000), breaks=20, main="special_old", xlab="x")
+## hist(aceitacao_rejeicao_special(10000), breaks=20, main="special", xlab="x")
+## hist(aceitacao_rejeicao_triang(10000, 1, 100, 75), breaks=20, main="triang", xlab="x")
 ```
 
 
@@ -215,7 +217,6 @@ ggplot(tibble(x = generated), aes(x)) +
 
 
 ```{r}
-?rnorm
 # a = 0, b = 100 e c = 50
 set.seed(2023)
 ggplot(tibble(x = rtriang(10000, 0, 100, 50)), aes(x)) + 
@@ -245,5 +246,74 @@ ggplot(tibble(x = rtriang(10000, 1, 100, 70)), aes(x)) +
   stat_function(fun = dtriang, args = list(a = 1, b = 100, c = 70), color = "#404B69", linewidth = 1) +
   labs(title = "Distribuição triangular gerada (a = 1, b = 100, c = 70)", x = "x", y = "Densidade")
 
+```
+
+```{r}
+## generate points
+# a = 1, b = 100, c = 50
+aceitacao_rejeicao_points <- function(n, a, b, c) {
+  C <- dtriang(c, a, b, c)
+  f <- function(x) dtriang(x, a, b, c)
+  points <- tibble(x = numeric(0), y = numeric(0), accepted = logical(0))
+  for(i in 1:n) {
+    x <- runif(1, a, b)
+    u <- runif(1, 0, 1)
+    if(u <= f(x)/C**) {
+      points <- points %>% add_row(x = x, y = u, accepted = TRUE)
+    } else {
+      points <- points %>% add_row(x = x, y = u, accepted = FALSE)
+    }
+  }
+  return(points)
+}
+df <- aceitacao_rejeicao_points(10000, 1, 100, 50)
+ggplot(df, aes(x, y)) + 
+  geom_point(aes(color = accepted), alpha = 0.5) +
+  labs(title = "Aceitação e rejeição", x = "x", y = "y") +
+  scale_colour_manual("", values = c("TRUE" = "#F73859", "FALSE" = "#404B69"), guide = guide_legend())
+```
+
+```{r}
+## draw f(x), g(x) and f(x)/g(x), f being dtriang and g being dunif
+# a = 1, b = 100, c = 50
+a <- 1
+b <- 100
+c <- 50
+f <- \(x) dtriang(x, a, b, c)
+g <- \(x) dunif(x, a, b)
+plot(f, from = a, to = b, col = "#F73859", main = "f(x), g(x) and f(x)/g(x)", xlab = "x", ylab = "y")
+plot(g, from = a, to = b, col = "#404B69", add = T)
+plot(\(x) f(x)/g(x), from = a, to = b, col = "#404B69", lty = 2, add = T)
+legend("topright", legend = c("f(x)", "g(x)", "f(x)/g(x)"), col = c("#F73859", "#404B69", "#404B69"), lty = c(1, 1, 2))
+library(zoom)
+zm()
+```
+
+```{r}
+```
+
+```{r}
+```
+
+```{r}
+# aceitacao_rejeicao_triang <- function(n, a = 0, b = 1, c = 0.5) {
+#   f <- \(x) dtriang(x, a, b, c)
+#   # proposed function
+#   g <- \(x) dunif(x, a, b)
+#   # x (random variable) generator 
+#   X <- \() runif(1, a, b)
+#   # c: max of f, so that c >= f(x) / g(x) for all x
+#   C <- f(c) ## o maximo da funcao triangular e no dtriang(c)
+#   # monte carlo (u(0, 1) <= f(x) / (c*g(x)) <=> u(0, c*g(x)) <= f(x))
+#   u <- \(x) runif(n=1, min=0, max=1)
+#   
+#   ret <- c()
+#   while(length(ret) < n) {
+#     x <- X()
+#     if (u(x) <= f(x) / (C*g(x)))
+#       ret <- c(ret, x)
+#   }
+#   ret
+# }
 ```
 
