@@ -7,6 +7,7 @@ library(tidyverse)
 library(conflicted)
 library(gridExtra)
 library(ggplot2)
+library(cowplot)
 # Seed
 set.seed(2023)
 
@@ -44,20 +45,46 @@ rtriang <- function(n, a = 0, b = 1, c = 0.5) {
   ret
 }
 
+# grafico 1,2
+aceitacao_rejeicao_points <- function(n, a, b, c) {
+  f <- \(x) dtriang(x, a, b, c)
+  # proposed function
+  g <- \(x) dunif(x, a, b)
+  # x (random variable) generator 
+  X <- \() runif(1, a, b)
+  # c: max of f, so that c >= f(x) / g(x) for all x
+  C <- (f(c)/g(c)) ## o maximo da funcao triangular e no dtriang(c)
+  # monte carlo (u(0, 1) <= f(x) / (c*g(x)) <=> u(0, c*g(x)) <= f(x))
+  U <- \() runif(n=1, min=0, max=1)
+  points <- tibble(x = numeric(0), y = numeric(0), accepted = factor(0))
+  for(i in 1:n) {
+    x <- X()
+    u <- U()
+    if(u <= f(x) / (C*g(x))) {
+      points <- points %>% add_row(x = x, y = u, accepted = "Aceitado")
+    } else {
+      points <- points %>% add_row(x = x, y = u, accepted = "Rejeitado")
+    }
+  }
+  return(points)
+}
+
 # a = 0, b = 100 e c = 50
 set.seed(2023)
-gg1 <- ggplot(tibble(x = rtriang(10000, 0, 10, 5)), aes(x)) + 
+gg1 <- ggplot(tibble(x = rtriang(10000, 0, 100, 50)), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
   geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
-  stat_function(fun = dtriang, args = list(a = 0, b = 10, c = 5), color = "#404B69", linewidth = 1) +
-  labs(title = "a = 0, b = 10, c = 5", x = "x", y = "Densidade")
-# a = 0, b = 10 e c = 5
+  stat_function(fun = dtriang, args = list(a = 0, b = 100, c = 50), color = "#404B69", linewidth = 1) +
+  labs(title = "a = 0, b = 100, c = 50", x = "x", y = "Densidade")
+
+# a = 0, b = 100 e c = 50 pontos gerados
 set.seed(2023)
-gg2 <- ggplot(tibble(x = rtriang(10000, 0, 20, 20)), aes(x)) + 
-  geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
-  geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
-  stat_function(fun = dtriang, args = list(a = 0, b = 20, c = 20), color = "#404B69", linewidth = 1) +
-  labs(title = "a = 0, b = 20, c = 20", x = "x", y = "Densidade")
+gg2 <- ggplot(aceitacao_rejeicao_points(10000, 0, 100, 50), aes(x, y)) +
+  geom_point(aes(color = accepted), alpha = 0.5, size = 0.4) +
+  labs(title = "10000 Pontos gerados (0, 100, 50)", x = "x", y = "u") +
+  scale_color_manual(values = c("Aceitado" = "#F73859", "Rejeitado" = "#404B69")) +
+  theme(legend.position = "none")
+
 # a = 1, b = 2, c = 1.2
 set.seed(2023)
 gg3 <- ggplot(tibble(x = rtriang(10000, 1, 2, 1.2)), aes(x)) + 
@@ -65,16 +92,19 @@ gg3 <- ggplot(tibble(x = rtriang(10000, 1, 2, 1.2)), aes(x)) +
   geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
   stat_function(fun = dtriang, args = list(a = 1, b = 2, c = 1.2), color = "#404B69", linewidth = 1) +
   labs(title = "a = 1, b = 2, c = 1.2", x = "x", y = "Densidade")
-# a = 1, b = 100, c = 70
+
+# a = 0, b = 20 e c = 20
 set.seed(2023)
-gg4 <- ggplot(tibble(x = rtriang(10000, 1, 100, 70)), aes(x)) + 
+gg4 <- ggplot(tibble(x = rtriang(10000, 0, 20, 20)), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
   geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
-  stat_function(fun = dtriang, args = list(a = 1, b = 100, c = 70), color = "#404B69", linewidth = 1) +
-  labs(title = "a = 1, b = 100, c = 70", x = "x", y = "Densidade")
+  stat_function(fun = dtriang, args = list(a = 0, b = 20, c = 20), color = "#404B69", linewidth = 1) +
+  labs(title = "a = 0, b = 20, c = 20", x = "x", y = "Densidade")
+
 
 grid.arrange(gg1, gg2, gg3 , gg4, nrow=2, ncol=2,top="Distribuição triangular gerada") %>% 
   ggsave(filename = "mygrid_plot.svg", device = "svg", width = 2400, height= 1800, units = "px")
+
 
 ######################## Exercício 2 #######################################
 
