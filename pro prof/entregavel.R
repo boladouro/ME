@@ -126,7 +126,7 @@ tribble(
   "Observado (a = 0, b = 10, c = 5)", mean(generated2), median(generated2), var(generated2),
   "Teórico (a = 1, b = 2, c = 1.2)", mean_triang(1, 2, 1.2), median_triang(1, 2, 1.2), variance_triang(1, 2, 1.2),
   "Observado (a = 1, b = 2, c = 1.2)", mean(generated3), median(generated3), var(generated3),
-  "Teórico (a = 0, b = 20, c = 20)", mean_triang(1, 20, 20), median_triang(1, 20, 20), variance_triang(1, 20, 20),
+  "Teórico (a = 0, b = 20, c = 20)", mean_triang(0, 20, 20), median_triang(0, 20, 20), variance_triang(0, 20, 20),
   "Observado (a = 0, b = 20, c = 20)", mean(generated4), median(generated4), var(generated4)
 ) -> stats
 stats
