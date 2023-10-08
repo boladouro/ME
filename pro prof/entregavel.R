@@ -24,7 +24,7 @@ dtriang <- function(x, a = 0, b = 1, c= 0.5) {
 extraDistr::dtriang(1:10,1,10,3)
 dtriang(1:10,1,10,3)
 
-rtriang <- function(n, a = 0, b = 1, c = 0.5) {
+rtriang <- function(n, a = 0, b = 1, c = 0.5, seed = 2023) {
   f <- \(x) dtriang(x, a, b, c)
   # proposed function
   g <- \(x) dunif(x, a, b)

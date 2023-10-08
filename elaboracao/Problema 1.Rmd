@@ -34,42 +34,13 @@ dtriang(1:10,1,10,3)
 ```
 
 ```{r}
-aceitacao_rejeicao_triang_old <- function(n, a, b, c) {
-  i <- 0
-  ret <- numeric(n)
-  while (i < n) {
-    u <- runif(1)
-    x <- runif(1, a, b)
-    dist_trg <- dtriang(x, a, b, c)
-    if (u <= dist_trg) {
-      i <- i + 1
-      ret[i] <- x
-    }
-  }
-  return(ret)
-}
-
-dspecial <- \(x) {
+dtest <- \(x) {
   if(x < 0 | x > 1) return(0)
   (3/2)*x^3 + (11/8)*x^2 + (1/6)*x + 1/12
 }
 
-aceitacao_rejeicao_special_old <- function(n) {
-  i <- 0
-  ret <- numeric(n)
-  while (i < n) {
-    u <- runif(1)
-    x <- runif(1)
-    dist_trg <- dspecial(x)
-    if (u <= dist_trg) {
-      i <- i + 1
-      ret[i] <- x
-    }
-  }
-  return(ret)
-}
-
-aceitacao_rejeicao_triang <- function(n, a = 0, b = 1, c = 0.5) {
+aceitacao_rejeicao_triang <- function(n, a = 0, b = 1, c = 0.5, seed = 2023) {
+  set.seed(seed)
   f <- \(x) dtriang(x, a, b, c)
   # proposed function
   g <- \(x) dunif(x, a, b)
@@ -90,8 +61,8 @@ aceitacao_rejeicao_triang <- function(n, a = 0, b = 1, c = 0.5) {
 }
 rtriang <- aceitacao_rejeicao_triang
 
-aceitacao_rejeicao_special <- function(n) {
-  f <- dspecial
+aceitacao_rejeicao_test <- function(n) {
+  f <- dtest
   # proposed function
   g <- dunif
   # x (random variable) generator 
@@ -109,101 +80,15 @@ aceitacao_rejeicao_special <- function(n) {
   }
   ret
 }
-
-aceitacao_rejeicao_como_prof_fez <- function(n, a, b, c, iter = 1e6) {
-  X <- runif(iter, a, b)
-  U <- runif(iter, 0, 1)
-  fx <- \(x) dtriang(x, a, b, c)
-  count <- 1
-  accept <- c()
-  C <- 100
-  while(count <= iter & length(accept) < n) {
-    u_sim <- U[count]
-    cg_x <- fx(X[count]) / (C * dunif(X[count], a, b)) # g(x)
-    if(u_sim <= cg_x) {
-      accept <- c(accept, X[count])
-      count <- count + 1
-    } else {
-      count <- count + 1
-    }
-  }
-  return(accept)
-}
-aceitacao_rejeicao_como_prof_fez(5, 0, 10, 5)
 ```
-
-
-```{r temp-chatgpt}
-
-# Define the function for the triangular distribution
-triangular_pdf <- function(x, a, b, c) {
-  ifelse(x >= a & x <= c, 2 * (x - a) / ((b - a) * (c - a)),
-         ifelse(x > c & x <= b, 2 * (b - x) / ((b - a) * (b - c)),
-                0))
-}
-
-# Define the function for the enveloping distribution (uniform)
-uniform_pdf <- function(x, a, b) {
-  ifelse(x >= a & x <= b, 1 / (b - a), 0)
-}
-
-# Generate random numbers using rejection sampling
-generate_triangular <- function(n, a, b, c) {
-  result <- numeric(n)
-  i <- 1
-  
-  while (i <= n) {
-    # Generate a random number from the uniform distribution
-    x <- runif(1, a, b)
-    
-    # Generate a random number from the uniform distribution to compare with acceptance probability
-    u <- runif(1)
-    
-    # Calculate the acceptance probability
-    acceptance_prob <- triangular_pdf(x, a, b, c) / (uniform_pdf(x, a, b))
-    
-    # Accept or reject the sample
-    if (u <= acceptance_prob) {
-      result[i] <- x
-      i <- i + 1
-    }
-  }
-  
-  return(result)
-}
-
-# Generate 1000 random numbers from the triangular distribution
-n <- 1000
-# Plot a histogram to visualize the generated samples
-ggplot(tibble(x = generated), aes(x)) + 
-  geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
-  geom_density(aes(color = "observado"), kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.4) + 
-  stat_function(aes(color = "teorico"), fun = dtriang, args = list(a = 1, b = 100, c = 50), linewidth = 1) +
-  labs(title = "Distribuição triangular gerada (a = 1, b = 100, c = 50)", x = "x", y = "Densidade") +
-  scale_colour_manual("", values = c("observado" = "#F73859", "teorico" = "#404B69"), guide = guide_legend())
-
-```
-
 
 ```{r plots}
 set.seed(2023)
 tic()
-  generated <- rtriang(10000, 1, 100, 50)
+  generated <- rtriang(10000, 0, 100, 50)
 toc()
 generated %>% head()
 ```
-
-```{r}
-## set.seed(2023)
-## hist(generated, breaks=20, main="main", xlab="x")
-## # hist(extraDistr::rtriang(10000, 1, 2, 0.5), breaks=1000, main="teorico", xlab="x")
-## hist(aceitacao_rejeicao_como_prof_fez(10000, 1, 100, 50), breaks=20, main="prof", xlab="x")
-## hist(aceitacao_rejeicao_triang_old(10000, 1, 100, 50), breaks=20, main="triang_old", xlab="x")
-## hist(aceitacao_rejeicao_special_old(10000), breaks=20, main="special_old", xlab="x")
-## hist(aceitacao_rejeicao_special(10000), breaks=20, main="special", xlab="x")
-## hist(aceitacao_rejeicao_triang(10000, 1, 100, 75), breaks=20, main="triang", xlab="x")
-```
-
 
 ```{r}
 # Agora bonito
@@ -211,42 +96,64 @@ ggplot(tibble(x = generated), aes(x)) +
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
   geom_density(aes(color = "observado"), kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.4) + 
   stat_function(aes(color = "teorico"), fun = dtriang, args = list(a = 1, b = 100, c = 50), linewidth = 1) +
-  labs(title = "Distribuição triangular gerada (a = 1, b = 100, c = 50)", x = "x", y = "Densidade") +
+  labs(title = "Distribuição triangular gerada (a = 0, b = 100, c = 50)", x = "x", y = "Densidade") +
   scale_colour_manual("", values = c("observado" = "#F73859", "teorico" = "#404B69"), guide = guide_legend())
 ```
 
 
 ```{r}
 # a = 0, b = 100 e c = 50
-set.seed(2023)
-ggplot(tibble(x = rtriang(10000, 0, 100, 50)), aes(x)) + 
+ggplot(tibble(x = generated), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
   geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
   stat_function(fun = dtriang, args = list(a = 0, b = 100, c = 50), color = "#404B69", linewidth = 1) +
   labs(title = "Distribuição triangular gerada (a = 0, b = 100, c = 50)", x = "x", y = "Densidade")
 # a = 0, b = 10 e c = 5
-set.seed(2023)
-ggplot(tibble(x = rtriang(10000, 0, 10, 5)), aes(x)) + 
+generated2 <- rtriang(10000, 0, 10, 5)
+ggplot(tibble(x = generated2), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
   geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
   stat_function(fun = dtriang, args = list(a = 0, b = 10, c = 5), color = "#404B69", linewidth = 1) +
   labs(title = "Distribuição triangular gerada (a = 0, b = 10, c = 5)", x = "x", y = "Densidade")
 # a = 1, b = 2, c = 1.2
-set.seed(2023)
-ggplot(tibble(x = rtriang(10000, 1, 2, 1.2)), aes(x)) + 
+generated3 <- rtriang(10000, 1, 2, 1.2)
+ggplot(tibble(x = generated3), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
   geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
   stat_function(fun = dtriang, args = list(a = 1, b = 2, c = 1.2), color = "#404B69", linewidth = 1) +
   labs(title = "Distribuição triangular gerada (a = 1, b = 2, c = 1.2)", x = "x", y = "Densidade")
 # a = 1, b = 100, c = 70
-set.seed(2023)
-ggplot(tibble(x = rtriang(10000, 1, 100, 70)), aes(x)) + 
+generated4 <- rtriang(10000, 1, 100, 70)
+ggplot(tibble(x = generated4), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
   geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
   stat_function(fun = dtriang, args = list(a = 1, b = 100, c = 70), color = "#404B69", linewidth = 1) +
   labs(title = "Distribuição triangular gerada (a = 1, b = 100, c = 70)", x = "x", y = "Densidade")
 
 ```
+
+
+```{r}
+# data frame com estatisticas teoricas e observadas
+
+mean_triang <- \(a, b, c) (a + b + c) / 3
+median_triang <- \(a, b, c) (2*c + b - a) / 4
+variance_triang <- \(a, b, c) (a^2 + b^2 + c^2 - a*b - a*c - b*c) / 18
+tribble(
+  ~desc, ~mean, ~median, ~variance,
+  "Teórico (a = 0, b = 100, c = 50)", mean_triang(0, 100, 50), median_triang(0, 100, 50), variance_triang(0, 100, 50),
+  "Observado (a = 0, b = 100, c = 50)", mean(generated), median(generated), var(generated),
+  "Teórico (a = 0, b = 10, c = 5)", mean_triang(0, 10, 5), median_triang(0, 10, 5), variance_triang(0, 10, 5),
+  "Observado (a = 0, b = 10, c = 5)", mean(generated2), median(generated2), var(generated2),
+  "Teórico (a = 1, b = 2, c = 1.2)", mean_triang(1, 2, 1.2), median_triang(1, 2, 1.2), variance_triang(1, 2, 1.2),
+  "Observado (a = 1, b = 2, c = 1.2)", mean(generated3), median(generated3), var(generated3),
+  "Teórico (a = 1, b = 100, c = 70)", mean_triang(1, 100, 70), median_triang(1, 100, 70), variance_triang(1, 100, 70),
+  "Observado (a = 1, b = 100, c = 70)", mean(generated4), median(generated4), var(generated4)
+) -> stats
+stats
+stats %>% knitr::kable( digits = 3, caption = "Estatísticas teóricas e observadas" )
+```
+
 
 ```{r}
 ## generate points
@@ -282,29 +189,6 @@ ggplot(aceitacao_rejeicao_points(10000, 0, 100, 50), aes(x, y)) +
 ```
 
 ```{r}
-# aceitacao_rejeicao_triang <- function(n, a = 0, b = 1, c = 0.5) {
-#   f <- \(x) dtriang(x, a, b, c)
-#   # proposed function
-#   g <- \(x) dunif(x, a, b)
-#   # x (random variable) generator 
-#   X <- \() runif(1, a, b)
-#   # c: max of f, so that c >= f(x) / g(x) for all x
-#   C <- (f(c)/g(c)) ## o maximo da funcao triangular e no dtriang(c)
-#   # monte carlo (u(0, 1) <= f(x) / (c*g(x)) <=> u(0, c*g(x)) <= f(x))
-#   u <- \() runif(n=1, min=0, max=1)
-#   
-#   ret <- c()
-#   while(length(ret) < n) {
-#     x <- X()
-#     if (u() <= f(x) / (C*g(x)))
-#       ret <- c(ret, x)
-#   }
-#   ret
-# }
-```
-
-
-```{r}
 ## draw f(x), g(x) and f(x)/g(x), f being dtriang and g being dunif
 # a = 1, b = 100, c = 50
 a <- 1
@@ -316,33 +200,5 @@ plot(f, from = a, to = b, col = "#F73859", main = "f(x), g(x) and f(x)/g(x)", xl
 plot(g, from = a, to = b, col = "#404B69", add = T)
 plot(\(x) f(x)/g(x), from = a, to = b, col = "#404B69", lty = 2, add = T)
 legend("topright", legend = c("f(x)", "g(x)", "f(x)/g(x)"), col = c("#F73859", "#404B69", "#404B69"), lty = c(1, 1, 2))
-```
-
-```{r}
-```
-
-```{r}
-```
-
-```{r}
-# aceitacao_rejeicao_triang <- function(n, a = 0, b = 1, c = 0.5) {
-#   f <- \(x) dtriang(x, a, b, c)
-#   # proposed function
-#   g <- \(x) dunif(x, a, b)
-#   # x (random variable) generator 
-#   X <- \() runif(1, a, b)
-#   # c: max of f, so that c >= f(x) / g(x) for all x
-#   C <- f(c) ## o maximo da funcao triangular e no dtriang(c)
-#   # monte carlo (u(0, 1) <= f(x) / (c*g(x)) <=> u(0, c*g(x)) <= f(x))
-#   u <- \(x) runif(n=1, min=0, max=1)
-#   
-#   ret <- c()
-#   while(length(ret) < n) {
-#     x <- X()
-#     if (u(x) <= f(x) / (C*g(x)))
-#       ret <- c(ret, x)
-#   }
-#   ret
-# }
 ```
 
