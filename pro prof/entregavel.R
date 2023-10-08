@@ -26,6 +26,7 @@ extraDistr::dtriang(1:10,1,10,3)
 dtriang(1:10,1,10,3)
 
 rtriang <- function(n, a = 0, b = 1, c = 0.5, seed = 2023) {
+  set.seed(seed)
   f <- \(x) dtriang(x, a, b, c)
   # proposed function
   g <- \(x) dunif(x, a, b)
@@ -46,7 +47,8 @@ rtriang <- function(n, a = 0, b = 1, c = 0.5, seed = 2023) {
 }
 
 # grafico 1,2
-aceitacao_rejeicao_points <- function(n, a, b, c) {
+aceitacao_rejeicao_points <- function(n, a, b, c, seed = 2023) {
+  set.seed(seed)
   f <- \(x) dtriang(x, a, b, c)
   # proposed function
   g <- \(x) dunif(x, a, b)
@@ -71,11 +73,16 @@ aceitacao_rejeicao_points <- function(n, a, b, c) {
 
 # a = 0, b = 100 e c = 50
 set.seed(2023)
-gg1 <- ggplot(tibble(x = rtriang(10000, 0, 100, 50)), aes(x)) + 
+generated <- rtriang(10000, 0, 100, 50)
+gg1 <- ggplot(tibble(x = generated), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
   geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
   stat_function(fun = dtriang, args = list(a = 0, b = 100, c = 50), color = "#404B69", linewidth = 1) +
   labs(title = "a = 0, b = 100, c = 50", x = "x", y = "Densidade")
+
+# a = 0, b = 10 e c = 5 mesmo teste /10
+set.seed(2023)
+generated2 <- rtriang(10000, 0, 10 ,5)
 
 # a = 0, b = 100 e c = 50 pontos gerados
 set.seed(2023)
@@ -87,7 +94,8 @@ gg2 <- ggplot(aceitacao_rejeicao_points(10000, 0, 100, 50), aes(x, y)) +
 
 # a = 1, b = 2, c = 1.2
 set.seed(2023)
-gg3 <- ggplot(tibble(x = rtriang(10000, 1, 2, 1.2)), aes(x)) + 
+generated3 <- rtriang(10000, 1, 2, 1.2)
+gg3 <- ggplot(tibble(x = generated3), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
   geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
   stat_function(fun = dtriang, args = list(a = 1, b = 2, c = 1.2), color = "#404B69", linewidth = 1) +
@@ -95,7 +103,8 @@ gg3 <- ggplot(tibble(x = rtriang(10000, 1, 2, 1.2)), aes(x)) +
 
 # a = 0, b = 20 e c = 20
 set.seed(2023)
-gg4 <- ggplot(tibble(x = rtriang(10000, 0, 20, 20)), aes(x)) + 
+generated4 <- rtriang(10000, 0, 20, 20)
+gg4 <- ggplot(tibble(x = generated4), aes(x)) + 
   geom_histogram(aes(y = after_stat(density)), bins = 20, colour = "black", fill = "white") +
   geom_density(color = "#F73859", kernel = "gaussian", linewidth = 1, fill = "#F73859", alpha = 0.25) + 
   stat_function(fun = dtriang, args = list(a = 0, b = 20, c = 20), color = "#404B69", linewidth = 1) +
@@ -104,6 +113,25 @@ gg4 <- ggplot(tibble(x = rtriang(10000, 0, 20, 20)), aes(x)) +
 
 grid.arrange(gg1, gg2, gg3 , gg4, nrow=2, ncol=2,top="Distribuição triangular gerada") %>% 
   ggsave(filename = "mygrid_plot.svg", device = "svg", width = 2400, height= 1800, units = "px")
+
+
+mean_triang <- \(a, b, c) (a + b + c) / 3
+median_triang <- \(a, b, c) (2*c + b - a) / 4
+variance_triang <- \(a, b, c) (a^2 + b^2 + c^2 - a*b - a*c - b*c) / 18
+tribble(
+  ~desc, ~mean, ~median, ~variance,
+  "Teórico (a = 0, b = 100, c = 50)", mean_triang(0, 100, 50), median_triang(0, 100, 50), variance_triang(0, 100, 50),
+  "Observado (a = 0, b = 100, c = 50)", mean(generated), median(generated), var(generated),
+  "Teórico (a = 0, b = 10, c = 5)", mean_triang(0, 10, 5), median_triang(0, 10, 5), variance_triang(0, 10, 5),
+  "Observado (a = 0, b = 10, c = 5)", mean(generated2), median(generated2), var(generated2),
+  "Teórico (a = 1, b = 2, c = 1.2)", mean_triang(1, 2, 1.2), median_triang(1, 2, 1.2), variance_triang(1, 2, 1.2),
+  "Observado (a = 1, b = 2, c = 1.2)", mean(generated3), median(generated3), var(generated3),
+  "Teórico (a = 0, b = 20, c = 20)", mean_triang(1, 20, 20), median_triang(1, 20, 20), variance_triang(1, 20, 20),
+  "Observado (a = 0, b = 20, c = 20)", mean(generated4), median(generated4), var(generated4)
+) -> stats
+stats
+stats %>% knitr::kable( digits = 3, caption = "Estatísticas teóricas e observadas" )
+
 
 
 ######################## Exercício 2 #######################################
