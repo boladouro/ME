@@ -140,7 +140,7 @@ stats %>% knitr::kable( digits = 3, caption = "Estatísticas teóricas e observa
 
 gerar_amostras <- function(n_amostras, dimensao_de_cada_amostra, seed = 2023) {
   set.seed(seed)
-  df <- dimensao_de_cada_amostra
+  df <- 10 # mesmos graus de liberdade para todas as amostras
   matrix(rt(n = n_amostras * dimensao_de_cada_amostra, df = df), nrow = dimensao_de_cada_amostra)
 }
 
