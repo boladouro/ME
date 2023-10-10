@@ -1,1 +1,0 @@
-#set align(center)

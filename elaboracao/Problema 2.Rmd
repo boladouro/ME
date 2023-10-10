@@ -20,7 +20,7 @@ $$
 ```{r}
 gerar_amostras <- function(n_amostras, dimensao_de_cada_amostra, seed = 2023) {
   set.seed(seed)
-  df <- dimensao_de_cada_amostra
+  df <- 10 # arbitrário > 3
   matrix(rt(n = n_amostras * dimensao_de_cada_amostra, df = df), nrow = dimensao_de_cada_amostra)
 }
 

@@ -1,4 +1,5 @@
 // #import "@preview/algo:0.3.3": algo, i, d, comment, code
+#import "@preview/tablex:0.0.5": vlinex, hlinex
 #let project(fontsize:12pt, doc) ={
   let calculated_leading = 10.95pt
   set heading(
@@ -39,13 +40,32 @@
   show figure.where(
     kind: table
   ): set figure.caption(position: top)
-
   show figure.caption: set text(size: fontsize - 2pt)
   // set algo() // not an element func yet (cause it's not possible on 0.8)
   show figure.where(
     kind: grid
   ): set figure(kind: image) // n funciona n sei pq
-  
+
   set figure(placement: auto)
+  show figure.where(
+    kind: "Algoritmo"
+  ): set figure(placement: none) // juro que nao percebo pq e q isto n funciona
+  set list(indent: 0.6cm)
   doc
+}
+
+#let vline(start:none, end:none) = {
+  vlinex(start:start, end:end, stroke:0.5pt)
+}
+
+#let hline(start:none, end:none) = {
+  hlinex(start:start, end:end, stroke:0.5pt)
+}
+
+#let hline_header(start:none, end:none) = {
+  hlinex(start:start, end:end, stroke:0.5pt, expand:-3pt)
+}
+
+#let hline_before(start:none, end:none) = {
+  // hlinex(start:start, end:end, stroke:0.5pt, expand:-3pt)
 }
