@@ -22,7 +22,7 @@ $ <fdp>
 //   caption: [Distribuição triangular #footnote[_Wikimedia Commons_. #link("https://w.wiki/7gM$")]]
 // )
 
-O método da aceitação-rejeição é um método de Monte Carlo com o objetivo de gerar de números pseudo-aleatórios (NPAs) de uma distribuição não-uniforme. Consiste num processo iterativo que pretende aceitar ou rejeitar NPAs $bold(X)$ geradas a partir do domínio ${x: f(x) != 0}$ de uma distribuição objetivo $f(x)$ de acordo com a probabilidade $P [X = x]$. Para isto, o processo irá gerar pontos da área de uma distribuição $C dot g(x)$ e verificar se esses também pertencem à área de $f(x)$. Ou seja, se @condicao se observar então $x$ é "aceite" como um NPA gerado da distribuição de $f(x)$.
+O método da aceitação-rejeição é um método de Monte Carlo com o objetivo de gerar números pseudo-aleatórios (NPAs) de uma distribuição não-uniforme. Consiste num processo iterativo que pretende aceitar ou rejeitar NPAs $bold(X)$ geradas a partir do domínio ${x: f(x) != 0}$ de uma distribuição objetivo $f(x)$ de acordo com a probabilidade $P [X = x]$. Para isto, o processo irá gerar pontos da área de uma distribuição $C dot g(x)$ e verificar se esses também pertencem à área de $f(x)$. Ou seja, se @condicao se observar então $x$ é "aceite" como um NPA gerado da distribuição de $f(x)$.
 
 // o processo irá gerar NPAs de uma outra distribuição $g(x)$ (cuja geração não seja dispendiosa) e compará-la perante NPAs de uma distribuição uniforme entre 0 e 1 $u(0, 1)$. 
 
@@ -78,14 +78,14 @@ Estatísticas teóricas e observadas
 ] <resultados1>
 
 
-Podemos obervar que as formas estão bastante semelhantes ao teórico, e as estatísticas amostras analisadas são extremamente semelhantes às teóricas, provando assim a eficácia do gerador e a confiância que podemos ter nele. Os resultados completos encontram-se em anexo.
+Podemos obervar que as formas estão bastante semelhantes ao teórico, e as estatísticas amostrais analisadas são extremamente semelhantes às teóricas, provando assim a eficácia do gerador e a confiância que podemos ter nele. Os resultados completos encontram-se em anexo.
 
 = 2)
 
 O nosso objetivo neste problema foi avaliar e comparar o comportamento de dois estimadores para a assimetria: um usando quantis para o cálculo ($s_1$), e outro sendo o Coeficiente de Groeneveld e Meeden ($s_2$). Para isso, usámos um gerador da distribuição _t-student_, para gerar 3 conjuntos de 100 amostras, cada conjunto com diferentes dimensões de amostras; e calculamos métricas de erros entre o valor teórico (para $nu > 3$, a assimetira da distribuição será $0$)#footnote[Nós escolhemos como propriedade da distribuição _t-student_ usar graus de liberdade $nu = 10$, para facilitar a comparação dos estimadores e para a distribuição não se aproximar tanto a uma normal.], e os valores estimados. As métricas usadas foram o erro-padrão (EP) (desvio padrão de uma estimativa) e o erro quadrático médio (EQM).
 
-O processo pode-se encontrar em anexo e na @resultados2 encontra-se os resultados obtidos.
-
+O processo pode-se encontrar em anexo e na @resultados2 encontram-se os resultados obtidos.
+ 
 #figure(caption: "Resultados dos estimadores",gridx(
   rows: (auto),
   columns: (auto, auto),
@@ -114,7 +114,7 @@ O processo pode-se encontrar em anexo e na @resultados2 encontra-se os resultado
   image("images/box_jitter_ex2.svg", height: 230pt)
 )) <resultados2>
 
-Pudemos obervar que a dispersão das assimetrias estimadas, e consequentemente a distância inter-quartil é bastante inferior usando $s_2$ em vez de $s_1$. Pudemos notar também que os valores das métricas de erro são menores usando $s_2$. Para além disso, verificamos que quanto maior a dimensão das amostras, mais preciso fica a nossa mediana da assimetria teórica da distribuição. Com isto, podemos concluir que:
+Pudemos obervar que a dispersão das assimetrias estimadas, e consequentemente a distância inter-quartil é bastante inferior usando $s_2$ em vez de $s_1$. Pudemos notar também que os valores das métricas de erro são menores usando $s_2$. Para além disso, verificamos que quanto maior a dimensão das amostras, mais precisa fica a nossa mediana da assimetria teórica da distribuição. Com isto, podemos concluir que:
 
 - Quanto maior a dimensão das amostras, maior a precisão e exatidão dos estimadores;
 - O estimador $s_2$ tem maior precisão e exatidão na estimação da assimetria na distribuição _t-student_.#footnote[Pelo menos quando $nu = 10$.]
