@@ -56,7 +56,7 @@
 }
 #par(leading: 0.3cm)[
   #text(16pt)[10 de outubro 2023]\
-  #text(16pt)[Versão 1.0.0]
+  #text(16pt)[Versão 1.0.1]
 ]
 #v(3cm)
 #set align(left)
