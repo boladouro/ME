@@ -1,10 +1,11 @@
 # ME
 
-```
-just -l
-just build
-```
+2 trabalhos de Modelação estocástica, por André Plancha e João Francisco Botas
 
-## TODO
+## 1
 
-* Cache
+Método de Aceitação-Rejeição & Análise de Estimadores
+
+## 2 
+
+WIP
